@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Play-kolabs — RPGs where every character has a brain</title>
+<meta name="description" content="An AI RPG concept where every character is a living agent with a real neuro-inspired brain: memories in brain regions, hormones, and physiology that drive behavior." />
+<style>
+  :root{ --bg:#0a0c12; --panel:#11141d; --line:#222838; --ink:#e7e9ee; --muted:#9aa0ad; --accent:#7aa2ff; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--accent)}
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  header{padding:64px 0 28px;text-align:center}
+  h1{font-size:40px;line-height:1.1;margin:0 0 12px;font-weight:600;letter-spacing:-.5px}
+  h1 .grad{background:linear-gradient(90deg,#7aa2ff,#5fd0c8,#ff6b8a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tag{font-size:19px;color:var(--muted);max-width:680px;margin:0 auto 22px}
+  .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-block;padding:10px 18px;border-radius:10px;text-decoration:none;font-weight:500;border:1px solid var(--line)}
+  .btn.primary{background:var(--accent);color:#08101f;border-color:transparent}
+  section{padding:36px 0}
+  h2{font-size:24px;font-weight:600;margin:0 0 6px;text-align:center}
+  .sub{color:var(--muted);text-align:center;margin:0 0 26px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .card h3{margin:0 0 6px;font-size:17px;font-weight:600}
+  .card p{margin:0;color:var(--muted);font-size:15px}
+  .brainwrap{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 16px;padding:14px 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .legend .row{display:flex;align-items:center;gap:7px}
+  .dot{width:11px;height:11px;border-radius:50%}
+  #brain{width:100%;height:520px;background:var(--bg)}
+  .hint{color:var(--muted);font-size:14px;text-align:center;margin-top:12px}
+  footer{padding:40px 0 64px;text-align:center;color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Play-kolabs<br/><span class="grad">RPGs where every character has a brain</span></h1>
+    <p class="tag">An AI Game Master concept — in the spirit of AI Dungeon and Fables.gg — where characters don't just react. They remember, feel, and keep living their own lives.</p>
+    <div class="btns"><a class="btn primary" href="#brain-section">Explore a 3D brain</a></div>
+  </header>
+
+  <section>
+    <div class="grid">
+      <div class="card"><h3>A real brain per character</h3><p>Memories are filed where biology stores them — hippocampus, cortex, prefrontal cortex, amygdala.</p></div>
+      <div class="card"><h3>Hormones &amp; body</h3><p>Dopamine, cortisol, oxytocin, adrenaline — plus blood oxygen, heart rate, and glucose that shape mood and choices.</p></div>
+      <div class="card"><h3>They live on their own</h3><p>Characters eat, rest, train, plan, and scheme in the background — even when nobody is playing.</p></div>
+      <div class="card"><h3>Associative memory</h3><p>A neural graph where recall blends recency, importance, and relevance, and links grow stronger with use.</p></div>
+      <div class="card"><h3>AI Game Master</h3><p>Narrates from the world's lore and each character's actual recalled memories.</p></div>
+      <div class="card"><h3>Living, evolving cast</h3><p>Relationships grow, beliefs change, and each character keeps their own history.</p></div>
+    </div>
+  </section>
+
+  <section id="brain-section">
+    <h2>A character's mind, in 3D</h2>
+    <p class="sub">Each sphere is a memory, fixed in the brain region that stores it. Lines are associations. Drag to orbit, scroll to zoom.</p>
+    <div class="brainwrap">
+      <div class="legend" id="legend"></div>
+      <div id="brain"></div>
+    </div>
+    <p class="hint">A live, interactive demo of one character after several sessions of play.</p>
+  </section>
+</div>
+
+<footer><div class="wrap">Play-kolabs · a personal project · the demo world shown is fan content for illustration only.</div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/3d-force-graph@1.70.10/dist/3d-force-graph.min.js"></script>
+<script>
+(function(){
+  var S=16;
+  var REG=[
+    {label:'Prefrontal cortex',color:'#7aa2ff',pos:[0,2.6,3.4],texts:[
+      'Keep my friends close — together we are untouchable.',
+      'Plan: stay hidden until I understand the Slate.',
+      'Maybe I do not have to carry the old guilt forever.']},
+    {label:'Temporal cortex (facts)',color:'#9b8cff',pos:[-3.4,0.2,0.4],texts:[
+      'The Slate grants kings their aura.','The Red clan runs on passion and fire.',
+      'The Blue clan polices the use of powers.','The Green clan gamifies power through an app.',
+      'The Gold King rules from the shadows.','A Sword of Damocles hangs over every king.',
+      'My aura makes me immune to other kings.','My friend is a Strain who bends perception.']},
+    {label:'Hippocampus (memories)',color:'#5fd0c8',pos:[-1.6,-0.6,-0.4],texts:[
+      'Ate breakfast on the airship.','A friend cooked dinner; perfect as always.',
+      'Drifted over the city at dawn.','Someone fell asleep against my side.',
+      'We argued about trusting the stranger.']},
+    {label:'Amygdala (emotional)',color:'#ff6b8a',pos:[-1.2,-0.9,1.2],texts:[
+      'A stranger once wore my face — it still scares me.','I will not let anyone hurt my friends.']},
+    {label:'Nucleus accumbens (reward)',color:'#ffb454',pos:[0.6,-0.2,1.6],texts:[
+      'Flying feels like freedom.','I want to taste every sweet in the city.']},
+    {label:'Hypothalamus (drives)',color:'#ffd45f',pos:[0,-1.2,0.6],texts:[
+      'Getting hungry again.','It is late; my body wants sleep.']},
+    {label:'Insula (body sense)',color:'#6fcf7f',pos:[2.6,-0.2,0.8],texts:[
+      'Chest feels warm and calm.','A flutter of nerves before the meeting.']},
+    {label:'Brainstem (autonomic)',color:'#c0c4cc',pos:[0,-2.6,-1.6],texts:[
+      'Heartbeat steady.','Breathing slow and even.']}
+  ];
+  var nodes=[],links=[],idx={},gid=0;
+  REG.forEach(function(r){ idx[r.label]=[]; var J=3.0;
+    r.texts.forEach(function(t){ var id=gid++;
+      nodes.push({id:id,color:r.color,regionLabel:r.label,label:t,val:r.texts.length>5?2:3,
+        fx:r.pos[0]*S+(Math.random()-.5)*2*J, fy:r.pos[1]*S+(Math.random()-.5)*2*J, fz:r.pos[2]*S+(Math.random()-.5)*2*J});
+      idx[r.label].push(id);
+    });
+  });
+  function chain(a){ for(var i=0;i<a.length-1;i++) links.push({source:a[i],target:a[i+1]}); }
+  Object.keys(idx).forEach(function(k){ chain(idx[k]); });
+  function Lk(a,b){ if(a!=null&&b!=null) links.push({source:a,target:b}); }
+  var R=Object.keys(idx).map(function(k){return idx[k];});
+  Lk(R[3][0],R[2][2]); Lk(R[3][1],R[0][0]); Lk(R[3][0],R[1][7]); Lk(R[2][0],R[0][1]);
+  Lk(R[2][4],R[0][1]); Lk(R[1][6],R[0][0]); Lk(R[5][0],R[4][1]); Lk(R[6][0],R[3][1]);
+  Lk(R[4][0],R[2][2]); Lk(R[7][0],R[6][0]); Lk(R[5][1],R[7][1]);
+
+  document.getElementById('legend').innerHTML=REG.map(function(r){
+    return '<span class="row"><span class="dot" style="background:'+r.color+'"></span>'+r.label+'</span>';
+  }).join('');
+
+  function startGraph(){
+    if(typeof ForceGraph3D==='undefined'){ return setTimeout(startGraph,150); }
+    var el=document.getElementById('brain');
+    var Graph=ForceGraph3D()(el)
+      .backgroundColor('#0a0c12').width(el.clientWidth).height(520)
+      .graphData({nodes:nodes,links:links})
+      .nodeColor(function(n){return n.color;}).nodeVal(function(n){return n.val;})
+      .nodeOpacity(0.95).nodeResolution(14)
+      .linkColor(function(){return 'rgba(150,170,210,0.30)';})
+      .linkWidth(0.6).linkOpacity(0.55).enableNodeDrag(false)
+      .nodeLabel(function(n){return '<div style="font:12px sans-serif;color:#fff;background:rgba(10,12,18,.95);border:1px solid #2a3142;border-radius:6px;padding:6px 8px;max-width:240px"><b>'+n.regionLabel+'</b><br/>'+n.label+'</div>';});
+    Graph.d3Force('charge').strength(0);
+    var scene=Graph.scene();
+    var shell=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),
+      new THREE.MeshBasicMaterial({color:0x6f8bff,wireframe:true,transparent:true,opacity:0.07}));
+    shell.scale.set(72,58,66); shell.position.set(0,2,0); scene.add(shell);
+    var glow=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),
+      new THREE.MeshBasicMaterial({color:0x12203a,transparent:true,opacity:0.18,side:THREE.BackSide}));
+    glow.scale.set(70,56,64); glow.position.set(0,2,0); scene.add(glow);
+    function label(text,color,p){
+      var cv=document.createElement('canvas');cv.width=256;cv.height=64;
+      var x=cv.getContext('2d');x.font='600 26px sans-serif';x.fillStyle=color;x.textAlign='center';x.textBaseline='middle';
+      x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=6;x.fillText(text.split(' (')[0],128,32);
+      var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));
+      sp.position.set(p[0]*S,p[1]*S+7,p[2]*S);sp.scale.set(28,7,1);scene.add(sp);
+    }
+    REG.forEach(function(r){label(r.label,r.color,r.pos);});
+    Graph.cameraPosition({x:10,y:14,z:155});
+    var ang=0; setInterval(function(){ ang+=0.0022; var Rr=155; Graph.cameraPosition({x:Rr*Math.sin(ang),y:14,z:Rr*Math.cos(ang)}); },40);
+    addEventListener('resize',function(){Graph.width(el.clientWidth);});
+  }
+  startGraph();
+})();
+</script>
+</body>
+</html>
