@@ -120,16 +120,16 @@
       'Heartbeat steady.','Breathing slow and even.']}
   ];
   var nodes=[],links=[],idx={},gid=0,J=4.2;
-  function place(r,sign){
-    var key=r.key+(sign<0?'_L':'_R'); idx[key]=[];
-    var cx=(r.bi? sign*HX : 0)+ (r.bi? sign*r.c[0]*0.35 : r.c[0]);
+  function place(r,sign,suffix){
+    var key=r.key+suffix; idx[key]=[];
+    var cx=r.bi ? sign*HX + sign*r.c[0]*0.35 : r.c[0];
     r.texts.forEach(function(t){ var id=gid++;
       nodes.push({id:id,color:r.color,regionLabel:r.label,label:t,val:r.texts.length>5?2:2.6,
         fx:cx+(Math.random()-.5)*2*J, fy:r.c[1]+(Math.random()-.5)*2*J, fz:r.c[2]+(Math.random()-.5)*2*J});
       idx[key].push(id);
     });
   }
-  REG.forEach(function(r){ if(r.bi){ place(r,-1); place(r,1); } else { place(r,1); } });
+  REG.forEach(function(r){ if(r.bi){ place(r,-1,'_L'); place(r,1,'_R'); } else { place(r,1,''); } });
   function chain(a){ for(var i=0;i<a.length-1;i++) links.push({source:a[i],target:a[i+1]}); }
   Object.keys(idx).forEach(function(k){ chain(idx[k]); });
   function L(a,b){ if(a!=null&&b!=null) links.push({source:a,target:b}); }
