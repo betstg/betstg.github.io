@@ -4,11 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Play-kolabs — RPGs where every character has a brain</title>
-<meta name="description" content="An AI RPG concept where every character is a living agent with a real neuro-inspired brain: memories in brain regions, hormones, and physiology that drive behavior." />
+<meta name="description" content="An open-source AI RPG platform where every character is a living agent with a real neuro-inspired brain: memories in brain regions, hormones, and physiology that drive behavior." />
 <style>
-  :root{ --bg:#0a0c12; --panel:#11141d; --line:#222838; --ink:#e7e9ee; --muted:#9aa0ad; --accent:#7aa2ff; }
+  :root{ --bg:#0a0c12; --panel:#11141d; --line:#222838; --ink:#e7e9ee; --muted:#9aa0ad;
+         --accent:#7aa2ff; --teal:#5fd0c8; --pink:#ff6b8a; }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
   a{color:var(--accent)}
   .wrap{max-width:980px;margin:0 auto;padding:0 20px}
   header{padding:64px 0 28px;text-align:center}
@@ -18,6 +20,7 @@
   .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
   .btn{display:inline-block;padding:10px 18px;border-radius:10px;text-decoration:none;font-weight:500;border:1px solid var(--line)}
   .btn.primary{background:var(--accent);color:#08101f;border-color:transparent}
+  .btn.ghost{color:var(--ink)}
   section{padding:36px 0}
   h2{font-size:24px;font-weight:600;margin:0 0 6px;text-align:center}
   .sub{color:var(--muted);text-align:center;margin:0 0 26px}
@@ -32,14 +35,18 @@
   #brain{width:100%;height:520px;background:var(--bg)}
   .hint{color:var(--muted);font-size:14px;text-align:center;margin-top:12px}
   footer{padding:40px 0 64px;text-align:center;color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:24px}
+  .note{background:#12203a55;border:1px solid #1e2b46;border-radius:12px;padding:14px 16px;color:#b9c4dd;font-size:14px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>Play-kolabs<br/><span class="grad">RPGs where every character has a brain</span></h1>
-    <p class="tag">An AI Game Master concept — in the spirit of AI Dungeon and Fables.gg — where characters don't just react. They remember, feel, and keep living their own lives.</p>
-    <div class="btns"><a class="btn primary" href="#brain-section">Explore a 3D brain</a></div>
+    <p class="tag">An open-source AI Game Master platform — in the spirit of AI Dungeon and Fables.gg — where characters don't just react. They remember, feel, and keep living their own lives.</p>
+    <div class="btns">
+      <a class="btn primary" href="#brain-section">Explore a 3D brain</a>
+      <a class="btn ghost" href="https://github.com/betstg/Play.Kolabs">View on GitHub</a>
+    </div>
   </header>
 
   <section>
@@ -48,8 +55,8 @@
       <div class="card"><h3>Hormones &amp; body</h3><p>Dopamine, cortisol, oxytocin, adrenaline — plus blood oxygen, heart rate, and glucose that shape mood and choices.</p></div>
       <div class="card"><h3>They live on their own</h3><p>Characters eat, rest, train, plan, and scheme in the background — even when nobody is playing.</p></div>
       <div class="card"><h3>Associative memory</h3><p>A neural graph where recall blends recency, importance, and relevance, and links grow stronger with use.</p></div>
-      <div class="card"><h3>AI Game Master</h3><p>Narrates from the world's lore and each character's actual recalled memories.</p></div>
-      <div class="card"><h3>Living, evolving cast</h3><p>Relationships grow, beliefs change, and each character keeps their own history.</p></div>
+      <div class="card"><h3>AI Game Master</h3><p>Narrates from the world's lore and each character's actual recalled memories, powered by Gemini.</p></div>
+      <div class="card"><h3>Open source &amp; free to self-host</h3><p>MIT-licensed engine. Run it on your own computer at no cost.</p></div>
     </div>
   </section>
 
@@ -60,64 +67,84 @@
       <div class="legend" id="legend"></div>
       <div id="brain"></div>
     </div>
-    <p class="hint">A live, interactive demo of one character after several sessions of play.</p>
+    <p class="hint">This is a live, interactive demo of one character (Shiro) after several sessions of play.</p>
+  </section>
+
+  <section>
+    <div class="note">
+      <strong>Want to actually play?</strong> The full game runs as a small server you host yourself for free —
+      see the <a href="https://github.com/betstg/Play.Kolabs/blob/main/SELF-HOST.md">self-hosting guide</a> on GitHub.
+      This page shows the project and its brain visualization; it doesn't run the game itself.
+    </div>
   </section>
 </div>
 
-<footer><div class="wrap">Play-kolabs · a personal project · the demo world shown is fan content for illustration only.</div></footer>
+<footer>
+  <div class="wrap">
+    Play-kolabs · open source (MIT) · <a href="https://github.com/betstg/Play.Kolabs">github.com/betstg/Play.Kolabs</a><br/>
+    The included "K-Project" world is fan content for demonstration only.
+  </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/3d-force-graph@1.70.10/dist/3d-force-graph.min.js"></script>
 <script>
 (function(){
-  var S=16;
+  // Region centres in the same coordinate space as the brain silhouette below
+  // (two cerebral hemispheres centred at x=±16). bi=true regions are mirrored into
+  // both hemispheres; midline structures (accumbens, hypothalamus, brainstem) sit at x≈0.
+  var HX=16; // hemisphere offset
   var REG=[
-    {label:'Prefrontal cortex',color:'#7aa2ff',pos:[0,2.6,3.4],texts:[
-      'Keep my friends close — together we are untouchable.',
-      'Plan: stay hidden until I understand the Slate.',
+    {key:'pfc', label:'Prefrontal cortex', color:'#7aa2ff', c:[8,28,34], bi:true, texts:[
+      'Keep Kuroh and Neko close — together we are untouchable.',
+      'Plan: stay hidden from Scepter 4 until I understand the Slate.',
       'Maybe I do not have to carry the old guilt forever.']},
-    {label:'Temporal cortex (facts)',color:'#9b8cff',pos:[-3.4,0.2,0.4],texts:[
-      'The Slate grants kings their aura.','The Red clan runs on passion and fire.',
-      'The Blue clan polices the use of powers.','The Green clan gamifies power through an app.',
+    {key:'tmp', label:'Temporal cortex (facts)', color:'#9b8cff', c:[27,2,6], bi:true, texts:[
+      'The Dresden Slate grants kings their aura.','HOMRA is the Red clan, led by Mikoto Suoh.',
+      'Scepter 4 polices the use of powers.','Jungle gamifies power through an app.',
       'The Gold King rules from the shadows.','A Sword of Damocles hangs over every king.',
-      'My aura makes me immune to other kings.','My friend is a Strain who bends perception.']},
-    {label:'Hippocampus (memories)',color:'#5fd0c8',pos:[-1.6,-0.6,-0.4],texts:[
-      'Ate breakfast on the airship.','A friend cooked dinner; perfect as always.',
-      'Drifted over the city at dawn.','Someone fell asleep against my side.',
-      'We argued about trusting the stranger.']},
-    {label:'Amygdala (emotional)',color:'#ff6b8a',pos:[-1.2,-0.9,1.2],texts:[
-      'A stranger once wore my face — it still scares me.','I will not let anyone hurt my friends.']},
-    {label:'Nucleus accumbens (reward)',color:'#ffb454',pos:[0.6,-0.2,1.6],texts:[
+      'The Silver aura makes me immune to other kings.','Neko is a Strain who bends perception.']},
+    {key:'hip', label:'Hippocampus (memories)', color:'#5fd0c8', c:[12,-8,-6], bi:true, texts:[
+      'Ate breakfast on the airship with Neko.','Kuroh cooked dinner; perfect as always.',
+      'Drifted over the city at dawn.','Neko fell asleep curled against my side.',
+      'We argued about trusting the defector.']},
+    {key:'amy', label:'Amygdala (emotional)', color:'#ff6b8a', c:[10,-10,11], bi:true, texts:[
+      'The colorless king wore my face — it still scares me.','I will not let anyone hurt Neko.']},
+    {key:'acc', label:'Nucleus accumbens (reward)', color:'#ffb454', c:[5,-4,16], bi:false, texts:[
       'Flying feels like freedom.','I want to taste every sweet in the city.']},
-    {label:'Hypothalamus (drives)',color:'#ffd45f',pos:[0,-1.2,0.6],texts:[
+    {key:'hyp', label:'Hypothalamus (drives)', color:'#ffd45f', c:[0,-16,6], bi:false, texts:[
       'Getting hungry again.','It is late; my body wants sleep.']},
-    {label:'Insula (body sense)',color:'#6fcf7f',pos:[2.6,-0.2,0.8],texts:[
+    {key:'ins', label:'Insula (body sense)', color:'#6fcf7f', c:[25,-2,9], bi:true, texts:[
       'Chest feels warm and calm.','A flutter of nerves before the meeting.']},
-    {label:'Brainstem (autonomic)',color:'#c0c4cc',pos:[0,-2.6,-1.6],texts:[
+    {key:'stm', label:'Brainstem (autonomic)', color:'#c0c4cc', c:[0,-33,-15], bi:false, texts:[
       'Heartbeat steady.','Breathing slow and even.']}
   ];
-  var nodes=[],links=[],idx={},gid=0;
-  REG.forEach(function(r){ idx[r.label]=[]; var J=3.0;
+  var nodes=[],links=[],idx={},gid=0,J=4.2;
+  function place(r,sign){
+    var key=r.key+(sign<0?'_L':'_R'); idx[key]=[];
+    var cx=(r.bi? sign*HX : 0)+ (r.bi? sign*r.c[0]*0.35 : r.c[0]);
     r.texts.forEach(function(t){ var id=gid++;
-      nodes.push({id:id,color:r.color,regionLabel:r.label,label:t,val:r.texts.length>5?2:3,
-        fx:r.pos[0]*S+(Math.random()-.5)*2*J, fy:r.pos[1]*S+(Math.random()-.5)*2*J, fz:r.pos[2]*S+(Math.random()-.5)*2*J});
-      idx[r.label].push(id);
+      nodes.push({id:id,color:r.color,regionLabel:r.label,label:t,val:r.texts.length>5?2:2.6,
+        fx:cx+(Math.random()-.5)*2*J, fy:r.c[1]+(Math.random()-.5)*2*J, fz:r.c[2]+(Math.random()-.5)*2*J});
+      idx[key].push(id);
     });
-  });
+  }
+  REG.forEach(function(r){ if(r.bi){ place(r,-1); place(r,1); } else { place(r,1); } });
   function chain(a){ for(var i=0;i<a.length-1;i++) links.push({source:a[i],target:a[i+1]}); }
   Object.keys(idx).forEach(function(k){ chain(idx[k]); });
-  function Lk(a,b){ if(a!=null&&b!=null) links.push({source:a,target:b}); }
-  var R=Object.keys(idx).map(function(k){return idx[k];});
-  Lk(R[3][0],R[2][2]); Lk(R[3][1],R[0][0]); Lk(R[3][0],R[1][7]); Lk(R[2][0],R[0][1]);
-  Lk(R[2][4],R[0][1]); Lk(R[1][6],R[0][0]); Lk(R[5][0],R[4][1]); Lk(R[6][0],R[3][1]);
-  Lk(R[4][0],R[2][2]); Lk(R[7][0],R[6][0]); Lk(R[5][1],R[7][1]);
+  function L(a,b){ if(a!=null&&b!=null) links.push({source:a,target:b}); }
+  var G=idx;
+  // a few cross-region associations + a corpus-callosum link across hemispheres
+  L(G.amy_R[0],G.hip_R[2]); L(G.amy_L[1],G.pfc_L[0]); L(G.tmp_R[6],G.pfc_R[0]);
+  L(G.tmp_L[0],G.hip_L[1]); L(G.acc[0],G.amy_R[0]); L(G.stm[0],G.hyp[0]);
+  L(G.ins_R[0],G.amy_R[1]); L(G.pfc_L[1],G.pfc_R[1]); L(G.hip_L[0],G.hip_R[0]);
 
   document.getElementById('legend').innerHTML=REG.map(function(r){
     return '<span class="row"><span class="dot" style="background:'+r.color+'"></span>'+r.label+'</span>';
   }).join('');
 
-  function startGraph(){
-    if(typeof ForceGraph3D==='undefined'){ return setTimeout(startGraph,150); }
+  function start(){
+    if(typeof ForceGraph3D==='undefined'){ return setTimeout(start,150); }
     var el=document.getElementById('brain');
     var Graph=ForceGraph3D()(el)
       .backgroundColor('#0a0c12').width(el.clientWidth).height(520)
@@ -127,27 +154,36 @@
       .linkColor(function(){return 'rgba(150,170,210,0.30)';})
       .linkWidth(0.6).linkOpacity(0.55).enableNodeDrag(false)
       .nodeLabel(function(n){return '<div style="font:12px sans-serif;color:#fff;background:rgba(10,12,18,.95);border:1px solid #2a3142;border-radius:6px;padding:6px 8px;max-width:240px"><b>'+n.regionLabel+'</b><br/>'+n.label+'</div>';});
-    Graph.d3Force('charge').strength(0);
+    Graph.d3Force('charge').strength(0); // keep nodes at their anatomical coords
+
+    // ---- brain silhouette: two cerebral hemispheres + glow + cerebellum + brainstem ----
     var scene=Graph.scene();
-    var shell=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),
-      new THREE.MeshBasicMaterial({color:0x6f8bff,wireframe:true,transparent:true,opacity:0.07}));
-    shell.scale.set(72,58,66); shell.position.set(0,2,0); scene.add(shell);
-    var glow=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),
-      new THREE.MeshBasicMaterial({color:0x12203a,transparent:true,opacity:0.18,side:THREE.BackSide}));
-    glow.scale.set(70,56,64); glow.position.set(0,2,0); scene.add(glow);
+    function ell(sx,sy,sz,px,py,pz,col,op){
+      var m=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),
+        new THREE.MeshBasicMaterial({color:col,wireframe:true,transparent:true,opacity:op}));
+      m.scale.set(sx,sy,sz); m.position.set(px,py,pz); scene.add(m); return m; }
+    ell(30,46,58,-HX,0,2,0x6f8bff,0.09); ell(30,46,58,HX,0,2,0x6f8bff,0.09); // L/R hemispheres
+    ell(60,48,72,0,0,2,0x12203a,0.10);                                        // outer glow
+    ell(20,12,16,0,-34,-44,0xff9bbf,0.10);                                    // cerebellum
+    var stem=new THREE.Mesh(new THREE.CylinderGeometry(4,6,30,16,1,true),
+      new THREE.MeshBasicMaterial({color:0xc0c4cc,wireframe:true,transparent:true,opacity:0.14}));
+    stem.position.set(0,-44,-18); stem.rotation.x=0.5; scene.add(stem);       // brainstem
+
     function label(text,color,p){
       var cv=document.createElement('canvas');cv.width=256;cv.height=64;
       var x=cv.getContext('2d');x.font='600 26px sans-serif';x.fillStyle=color;x.textAlign='center';x.textBaseline='middle';
       x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=6;x.fillText(text.split(' (')[0],128,32);
       var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));
-      sp.position.set(p[0]*S,p[1]*S+7,p[2]*S);sp.scale.set(28,7,1);scene.add(sp);
+      sp.position.set(p[0],p[1]+9,p[2]);sp.scale.set(30,7.5,1);scene.add(sp);
     }
-    REG.forEach(function(r){label(r.label,r.color,r.pos);});
-    Graph.cameraPosition({x:10,y:14,z:155});
-    var ang=0; setInterval(function(){ ang+=0.0022; var Rr=155; Graph.cameraPosition({x:Rr*Math.sin(ang),y:14,z:Rr*Math.cos(ang)}); },40);
+    // one label per region, placed over the right hemisphere (or midline)
+    REG.forEach(function(r){ var lx=r.bi? HX+r.c[0]*0.35 : r.c[0]; label(r.label,r.color,[lx,r.c[1],r.c[2]]); });
+
+    Graph.cameraPosition({x:8,y:10,z:170});
+    var ang=0; setInterval(function(){ ang+=0.0020; var Rr=170; Graph.cameraPosition({x:Rr*Math.sin(ang),y:12,z:Rr*Math.cos(ang)}); },40);
     addEventListener('resize',function(){Graph.width(el.clientWidth);});
   }
-  startGraph();
+  start();
 })();
 </script>
 </body>
